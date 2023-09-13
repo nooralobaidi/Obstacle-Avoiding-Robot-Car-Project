@@ -1,0 +1,162 @@
+#include <Servo.h>          // Include the Servo motor library
+
+#include <NewPing.h>        // Include the Ultrasonic sensor function library. You must install this library
+
+// Define pins for controlling the motors using the L298N motor driver
+const int LeftMotorForward = 7;
+const int LeftMotorBackward = 6;
+const int RightMotorForward = 5;
+const int RightMotorBackward = 4;
+
+// Define sensor pins
+#define trig_pin A1           // Define the trigger pin for the ultrasonic sensor
+#define echo_pin A2           // Define the echo pin for the ultrasonic sensor
+#define maximum_distance 200  // Define the maximum detection distance for the sensor
+
+boolean goesForward = false;   // Variable to track if the robot is moving forward
+int distance = 100;            // Initialize the distance variable
+NewPing sonar(trig_pin, echo_pin, maximum_distance); // Create a NewPing object for the sensor
+Servo servo_motor;             // Create a Servo object for the motor
+
+void setup() {
+  // Set motor control pins as OUTPUT
+  pinMode(RightMotorForward, OUTPUT);
+  pinMode(LeftMotorForward, OUTPUT);
+  pinMode(LeftMotorBackward, OUTPUT);
+  pinMode(RightMotorBackward, OUTPUT);
+  
+  // Attach the servo motor to pin 10 and set its initial position
+  servo_motor.attach(10);
+  servo_motor.write(115);
+  delay(2000);
+  
+  // Read initial distance from the sensor
+  distance = readPing();
+  delay(100);
+  distance = readPing();
+  delay(100);
+  distance = readPing();
+  delay(100);
+  distance = readPing();
+  delay(100);
+}
+
+void loop() {
+  int distanceRight = 0;
+  int distanceLeft = 0;
+  delay(50);
+  
+  // Check if an obstacle is too close (within 35 cm)
+  if (distance <= 35) {
+    moveStop();
+    delay(300);
+    moveBackward();
+    delay(400);
+    moveStop();
+    delay(300);
+    
+    // Look to the right and left to decide which way to turn
+    distanceRight = lookRight();
+    delay(300);
+    distanceLeft = lookLeft();
+    delay(300);
+    
+    // Determine the direction to turn based on the distances
+    if (distance >= distanceLeft) {
+      turnRight();
+      moveStop();
+    } else {
+      turnLeft();
+      moveStop();
+    }
+  } else {
+    moveForward();
+  }
+  
+  // Read the distance from the sensor for the next iteration
+  distance = readPing();
+}
+
+// Function to look to the right with the servo motor
+int lookRight() {
+  servo_motor.write(50);
+  delay(500);
+  int distance = readPing();
+  delay(100);
+  servo_motor.write(115);
+  return distance;
+}
+
+// Function to look to the left with the servo motor
+int lookLeft() {
+  servo_motor.write(170);
+  delay(500);
+  int distance = readPing();
+  delay(100);
+  servo_motor.write(115);
+  return distance;
+}
+
+// Function to read distance from the ultrasonic sensor
+int readPing() {
+  delay(70);
+  int cm = sonar.ping_cm();
+  if (cm == 0) {
+    cm = 250; // Set a maximum distance if no object is detected
+  }
+  return cm;
+} 
+
+// Function to stop both motors
+void moveStop() {
+  digitalWrite(RightMotorForward, LOW);
+  digitalWrite(LeftMotorForward, LOW);
+  digitalWrite(RightMotorBackward, LOW);
+  digitalWrite(LeftMotorBackward, LOW);
+}
+
+// Function to move the robot forward
+void moveForward() {
+  if (!goesForward) {
+    goesForward = true;
+    digitalWrite(LeftMotorForward, HIGH);
+    digitalWrite(RightMotorForward, HIGH);
+    digitalWrite(LeftMotorBackward, LOW);
+    digitalWrite(RightMotorBackward, LOW);
+  }
+}
+
+// Function to move the robot backward
+void moveBackward() {
+  goesForward = false;
+  digitalWrite(LeftMotorBackward, HIGH);
+  digitalWrite(RightMotorBackward, HIGH);
+  digitalWrite(LeftMotorForward, LOW);
+  digitalWrite(RightMotorForward, LOW);
+}
+
+// Function to turn the robot right
+void turnRight() {
+  digitalWrite(LeftMotorForward, HIGH);
+  digitalWrite(RightMotorBackward, HIGH);
+  digitalWrite(LeftMotorBackward, LOW);
+  digitalWrite(RightMotorForward, LOW);
+  delay(250);
+  digitalWrite(LeftMotorForward, HIGH);
+  digitalWrite(RightMotorForward, HIGH);
+  digitalWrite(LeftMotorBackward, LOW);
+  digitalWrite(RightMotorBackward, LOW); 
+}
+
+// Function to turn the robot left
+void turnLeft() {
+  digitalWrite(LeftMotorBackward, HIGH);
+  digitalWrite(RightMotorForward, HIGH);
+  digitalWrite(LeftMotorForward, LOW);
+  digitalWrite(RightMotorBackward, LOW);
+  delay(250);
+  digitalWrite(LeftMotorForward, HIGH);
+  digitalWrite(RightMotorForward, HIGH);
+  digitalWrite(LeftMotorBackward, LOW);
+  digitalWrite(RightMotorBackward, LOW);
+}
