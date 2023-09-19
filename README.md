@@ -1,8 +1,10 @@
 <h1 align="center">Obstacle-Avoiding-Robot-Project</h1>
 
+![IMG_3461](https://github.com/nooralobaidi/Obstacle-Avoiding-Robot-Car-Project/assets/112970543/bf71cf85-1b31-4099-a44e-88719b99e453)
 
+![IMG_3455](https://github.com/nooralobaidi/Obstacle-Avoiding-Robot-Car-Project/assets/112970543/dbb27c05-e163-4ef4-8af7-049754df71e8)
 
-
+![IMG_3462 (1)](https://github.com/nooralobaidi/Obstacle-Avoiding-Robot-Car-Project/assets/112970543/fe77c32b-5e94-4c20-bad5-d32984e3ef73)
 
 
 ## Project Objective:
